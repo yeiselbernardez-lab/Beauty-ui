@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Glow Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="top-bar">
+        <div class="top-bar__icon" aria-hidden="true">☰</div>
+        <h1 class="top-bar__title">Beauty &amp; Self-Improvement</h1>
+        <div class="top-bar__icon" aria-hidden="true">🔔</div>
+      </header>
+
+      <main class="screen-wrapper">
+        <section id="home-screen" class="screen is-active" aria-label="Home screen">
+          <div class="hero">
+            <p class="eyebrow">YOUR DAILY GLOW GUIDE</p>
+            <h2 class="hero__title">Welcome back, Mia</h2>
+            <p class="hero__subtitle">
+              Build mindful routines and discover beauty tips tailored to your mood.
+            </p>
+          </div>
+
+          <div class="nav-cards" aria-label="Navigation buttons">
+            <button class="nav-card" data-focus="Skin Care">
+              <span class="nav-card__emoji" aria-hidden="true">✨</span>
+              <span class="nav-card__title">Skin Care</span>
+              <span class="nav-card__desc">Glow + hydration plan</span>
+            </button>
+            <button class="nav-card" data-focus="Makeup">
+              <span class="nav-card__emoji" aria-hidden="true">💄</span>
+              <span class="nav-card__title">Makeup</span>
+              <span class="nav-card__desc">Looks for every vibe</span>
+            </button>
+            <button class="nav-card" data-focus="Hair Care">
+              <span class="nav-card__emoji" aria-hidden="true">💇</span>
+              <span class="nav-card__title">Hair Care</span>
+              <span class="nav-card__desc">Repair + shine goals</span>
+            </button>
+            <button class="nav-card" data-focus="Wellness">
+              <span class="nav-card__emoji" aria-hidden="true">🧘</span>
+              <span class="nav-card__title">Wellness</span>
+              <span class="nav-card__desc">Mindfulness and balance</span>
+            </button>
+          </div>
+
+          <div class="cta-banner">
+            <div>
+              <h3>Ready for today&apos;s challenge?</h3>
+              <p>Tap a focus area above to personalize your second screen.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="second-screen" class="screen" aria-label="Second screen">
+          <div class="panel">
+            <p class="eyebrow">PERSONALIZED CONTENT</p>
+            <h2 id="dynamic-title">Skin Care Focus</h2>
+            <p id="dynamic-description">
+              Gentle cleanse, vitamin C serum, and SPF 50 for your daytime routine.
+            </p>
+          </div>
+
+          <div class="grid-2">
+            <article class="content-card">
+              <h3>Morning Routine</h3>
+              <ul id="morning-list">
+                <li>Hydrating cleanser</li>
+                <li>Antioxidant serum</li>
+                <li>Moisturizer + SPF</li>
+              </ul>
+            </article>
+            <article class="content-card">
+              <h3>Evening Routine</h3>
+              <ul id="evening-list">
+                <li>Oil-based cleanser</li>
+                <li>Barrier-repair cream</li>
+                <li>Lip and eye hydration</li>
+              </ul>
+            </article>
+          </div>
+
+          <article class="progress-card">
+            <div>
+              <h3>Weekly Consistency</h3>
+              <p>Track your streak and improve one habit at a time.</p>
+            </div>
+            <div class="progress-ring" aria-label="Progress value">82%</div>
+          </article>
+        </section>
+
+        <section id="third-screen" class="screen" aria-label="Third screen">
+          <article class="profile-card">
+            <div class="avatar" aria-hidden="true">M</div>
+            <div>
+              <h2>Mia Thomson</h2>
+              <p>Glow Member • Joined 2025</p>
+            </div>
+            <button class="ghost-btn">Edit Profile</button>
+          </article>
+
+          <div class="stats-grid">
+            <article class="stat">
+              <h3>24</h3>
+              <p>Habits Completed</p>
+            </article>
+            <article class="stat">
+              <h3>11</h3>
+              <p>Day Streak</p>
+            </article>
+            <article class="stat">
+              <h3>8</h3>
+              <p>Saved Tutorials</p>
+            </article>
+            <article class="stat">
+              <h3>3</h3>
+              <p>Goals This Month</p>
+            </article>
+          </div>
+
+          <article class="content-card">
+            <h3>About You</h3>
+            <p>
+              Loving routines that are simple, effective, and gentle. Current goals:
+              brighter skin, healthier hair, and better sleep balance.
+            </p>
+          </article>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="Main navigation">
+        <button class="bottom-nav__item is-active" data-screen="home-screen">
+          Home
+        </button>
+        <button class="bottom-nav__item" data-screen="second-screen">Discover</button>
+        <button class="bottom-nav__item" data-screen="third-screen">Profile</button>
+      </nav>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>
