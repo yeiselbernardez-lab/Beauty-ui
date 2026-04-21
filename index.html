@@ -15,9 +15,17 @@
   <body>
     <div class="app-shell">
       <header class="top-bar">
-        <div class="top-bar__icon" aria-hidden="true">☰</div>
+        <button class="top-bar__icon top-action" data-screen="home-screen" aria-label="Open menu">
+          ☰
+        </button>
         <h1 class="top-bar__title">Beauty &amp; Self-Improvement</h1>
-        <div class="top-bar__icon" aria-hidden="true">🔔</div>
+        <button
+          class="top-bar__icon top-action"
+          data-screen="third-screen"
+          aria-label="Open notifications"
+        >
+          🔔
+        </button>
       </header>
 
       <main class="screen-wrapper">
@@ -58,6 +66,7 @@
               <h3>Ready for today&apos;s challenge?</h3>
               <p>Tap a focus area above to personalize your second screen.</p>
             </div>
+            <button class="luxury-btn" id="challenge-button">Open Today&apos;s Challenge</button>
           </div>
         </section>
 
@@ -105,7 +114,7 @@
               <h2>Mia Thomson</h2>
               <p>Glow Member • Joined 2025</p>
             </div>
-            <button class="ghost-btn">Edit Profile</button>
+            <button class="ghost-btn" id="edit-profile-btn">Edit Profile</button>
           </article>
 
           <div class="stats-grid">
@@ -144,6 +153,7 @@
         <button class="bottom-nav__item" data-screen="second-screen">Discover</button>
         <button class="bottom-nav__item" data-screen="third-screen">Profile</button>
       </nav>
+      <p id="interaction-feedback" class="interaction-feedback" aria-live="polite"></p>
     </div>
     <script src="./app.js"></script>
   </body>

@@ -37,6 +37,7 @@ const dynamicTitle = document.getElementById("dynamic-title");
 const dynamicDescription = document.getElementById("dynamic-description");
 const morningList = document.getElementById("morning-list");
 const eveningList = document.getElementById("evening-list");
+const editProfileButton = document.getElementById("edit-profile-btn");
 
 function renderList(target, items) {
   target.innerHTML = "";
@@ -80,3 +81,9 @@ focusButtons.forEach((button) => {
     setActiveScreen("second-screen");
   });
 });
+
+if (editProfileButton) {
+  editProfileButton.addEventListener("click", () => {
+    window.alert("Profile editor coming soon. Your preferences are saved.");
+  });
+}
