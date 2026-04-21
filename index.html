@@ -54,6 +54,16 @@
               <span class="nav-card__title">Hair Care</span>
               <span class="nav-card__desc">Repair + shine goals</span>
             </button>
+            <button class="nav-card" data-focus="Nail Care">
+              <span class="nav-card__emoji" aria-hidden="true">💅</span>
+              <span class="nav-card__title">Nail Care</span>
+              <span class="nav-card__desc">Strength + healthy finish</span>
+            </button>
+            <button class="nav-card" data-focus="Hygiene">
+              <span class="nav-card__emoji" aria-hidden="true">🛁</span>
+              <span class="nav-card__title">Hygiene</span>
+              <span class="nav-card__desc">Freshness and body care</span>
+            </button>
             <button class="nav-card" data-focus="Wellness">
               <span class="nav-card__emoji" aria-hidden="true">🧘</span>
               <span class="nav-card__title">Wellness</span>
@@ -72,38 +82,41 @@
 
         <section id="second-screen" class="screen" aria-label="Second screen">
           <div class="panel">
-            <p class="eyebrow">PERSONALIZED CONTENT</p>
-            <h2 id="dynamic-title">Skin Care Focus</h2>
+            <p class="eyebrow">RITUAL BUILDER</p>
+            <h2 id="dynamic-title">Skin Care Rituals</h2>
             <p id="dynamic-description">
-              Gentle cleanse, vitamin C serum, and SPF 50 for your daytime routine.
+              Choose rituals you'd like to try and build your personal care routine.
             </p>
           </div>
 
-          <div class="grid-2">
-            <article class="content-card">
-              <h3>Morning Routine</h3>
-              <ul id="morning-list">
-                <li>Hydrating cleanser</li>
-                <li>Antioxidant serum</li>
-                <li>Moisturizer + SPF</li>
-              </ul>
-            </article>
-            <article class="content-card">
-              <h3>Evening Routine</h3>
-              <ul id="evening-list">
-                <li>Oil-based cleanser</li>
-                <li>Barrier-repair cream</li>
-                <li>Lip and eye hydration</li>
-              </ul>
-            </article>
-          </div>
+          <article class="content-card ritual-categories-card">
+            <h3>Choose a Category</h3>
+            <div id="ritual-categories" class="ritual-categories" aria-label="Ritual categories"></div>
+          </article>
+
+          <article class="content-card ritual-library">
+            <div class="ritual-library__header">
+              <h3 id="ritual-list-title">Try these Skin Care rituals</h3>
+              <button class="ghost-btn" id="clear-rituals-btn">Clear Choices</button>
+            </div>
+            <p id="ritual-helper">
+              Tap any ritual below to add or remove it from your personal plan.
+            </p>
+            <div id="ritual-list" class="ritual-list" aria-label="Ritual options"></div>
+          </article>
 
           <article class="progress-card">
             <div>
-              <h3>Weekly Consistency</h3>
-              <p>Track your streak and improve one habit at a time.</p>
+              <h3>Selected Rituals</h3>
+              <p id="selection-summary">0 rituals selected across all categories.</p>
             </div>
-            <div class="progress-ring" aria-label="Progress value">82%</div>
+            <div
+              class="progress-ring"
+              id="selection-count"
+              aria-label="Ritual selection count"
+            >
+              0
+            </div>
           </article>
         </section>
 
