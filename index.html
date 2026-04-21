@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beauty Self-Improvement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient-shape shape-one" aria-hidden="true"></div>
+    <div class="ambient-shape shape-two" aria-hidden="true"></div>
+
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">✦</span>
+          <div>
+            <p class="brand-title">Beauty Bloom</p>
+            <p class="brand-subtitle">Self-Improvement App</p>
+          </div>
+        </div>
+
+        <nav class="top-nav" aria-label="Primary">
+          <button class="nav-btn is-active" data-screen-target="home-screen">
+            Home
+          </button>
+          <button class="nav-btn" data-screen-target="focus-screen">
+            Second Screen
+          </button>
+        </nav>
+      </header>
+
+      <main>
+        <section class="screen is-active" id="home-screen">
+          <div class="hero-card">
+            <p class="eyebrow">Welcome back</p>
+            <h1>Glow from the inside out.</h1>
+            <p class="hero-copy">
+              Build gentle routines that elevate your confidence, skin care,
+              wellness, and mindset with one beautiful daily flow.
+            </p>
+            <div class="hero-actions">
+              <button class="primary-btn" data-screen-target="focus-screen">
+                Start your journey
+              </button>
+              <button class="secondary-btn" data-screen-target="focus-screen">
+                Explore plans
+              </button>
+            </div>
+          </div>
+
+          <div class="option-grid" aria-label="Focus categories">
+            <button class="option-card" data-topic="skincare">
+              <span class="option-emoji" aria-hidden="true">✨</span>
+              <span class="option-title">Skincare Ritual</span>
+              <span class="option-detail">AM + PM tailored plan</span>
+            </button>
+            <button class="option-card" data-topic="fitness">
+              <span class="option-emoji" aria-hidden="true">💪</span>
+              <span class="option-title">Body Confidence</span>
+              <span class="option-detail">Strength + stretching mix</span>
+            </button>
+            <button class="option-card" data-topic="mindset">
+              <span class="option-emoji" aria-hidden="true">🧠</span>
+              <span class="option-title">Mindset Reset</span>
+              <span class="option-detail">Daily reflection prompts</span>
+            </button>
+            <button class="option-card" data-topic="style">
+              <span class="option-emoji" aria-hidden="true">👗</span>
+              <span class="option-title">Personal Style</span>
+              <span class="option-detail">Curated outfit suggestions</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="screen" id="focus-screen">
+          <div class="focus-header">
+            <p class="eyebrow">Second screen</p>
+            <h2 id="focus-title">Skincare Ritual Plan</h2>
+            <p id="focus-description">
+              A gentle routine for hydrated, bright skin with simple steps.
+            </p>
+          </div>
+
+          <div class="timeline-card">
+            <h3>Today&apos;s flow</h3>
+            <ul id="focus-steps"></ul>
+          </div>
+
+          <div class="insight-grid">
+            <article class="insight-card">
+              <p class="insight-label">Current streak</p>
+              <p class="insight-value" id="focus-streak">7 days</p>
+            </article>
+            <article class="insight-card">
+              <p class="insight-label">Daily challenge</p>
+              <p class="insight-value" id="focus-challenge">Hydrate + SPF</p>
+            </article>
+            <article class="insight-card">
+              <p class="insight-label">Mood boost</p>
+              <p class="insight-value" id="focus-boost">You are glowing.</p>
+            </article>
+          </div>
+
+          <div class="focus-actions">
+            <button class="secondary-btn" data-screen-target="home-screen">
+              Back home
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
