@@ -30,11 +30,11 @@ The app runs with Vite and uses `.env.local` for credentials.
 Create/update `.env.local` in the project root:
 
 ```env
-VITE_SUPABASE_URL=https://pgdflipyqudrptnkplbt.supabase.co
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+NEXT_PUBLIC_SUPABASE_URL=https://pgdflipyqudrptnkplbt.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-> Note: Vite only exposes env vars prefixed with `VITE_`.
+> Note: this project is built with Vite, so `vite.config.js` is configured to expose `NEXT_PUBLIC_*` variables to the browser.
 
 ## 3) Where to paste SQL in Supabase
 
