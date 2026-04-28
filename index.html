@@ -15,9 +15,17 @@
   <body>
     <div class="app-shell">
       <header class="top-bar">
-        <div class="top-bar__icon" aria-hidden="true">☰</div>
+        <button class="top-bar__icon top-action" data-screen="home-screen" aria-label="Go to home">
+          ☰
+        </button>
         <h1 class="top-bar__title">Beauty &amp; Self-Improvement</h1>
-        <div class="top-bar__icon" aria-hidden="true">🔔</div>
+        <button
+          class="top-bar__icon top-action"
+          data-screen="third-screen"
+          aria-label="Open profile screen"
+        >
+          🔔
+        </button>
       </header>
 
       <main class="screen-wrapper">
@@ -46,55 +54,73 @@
               <span class="nav-card__title">Hair Care</span>
               <span class="nav-card__desc">Repair + shine goals</span>
             </button>
+            <button class="nav-card" data-focus="Nail Care">
+              <span class="nav-card__emoji" aria-hidden="true">💅</span>
+              <span class="nav-card__title">Nail Care</span>
+              <span class="nav-card__desc">Healthy cuticles + stronger nails</span>
+            </button>
+            <button class="nav-card" data-focus="Hygiene">
+              <span class="nav-card__emoji" aria-hidden="true">🛁</span>
+              <span class="nav-card__title">Hygiene</span>
+              <span class="nav-card__desc">Freshness and body care habits</span>
+            </button>
             <button class="nav-card" data-focus="Wellness">
               <span class="nav-card__emoji" aria-hidden="true">🧘</span>
               <span class="nav-card__title">Wellness</span>
-              <span class="nav-card__desc">Mindfulness and balance</span>
+              <span class="nav-card__desc">Mindfulness and confidence rituals</span>
             </button>
           </div>
 
           <div class="cta-banner">
             <div>
               <h3>Ready for today&apos;s challenge?</h3>
-              <p>Tap a focus area above to personalize your second screen.</p>
+              <p>Tap a focus area above to personalize your ritual planner.</p>
             </div>
+            <button class="luxury-btn" id="challenge-button">Open Today&apos;s Challenge</button>
           </div>
         </section>
 
         <section id="second-screen" class="screen" aria-label="Second screen">
           <div class="panel">
-            <p class="eyebrow">PERSONALIZED CONTENT</p>
-            <h2 id="dynamic-title">Skin Care Focus</h2>
+            <p class="eyebrow">SUPABASE RITUAL PLANNER</p>
+            <h2 id="dynamic-title">Skin Care Rituals</h2>
             <p id="dynamic-description">
-              Gentle cleanse, vitamin C serum, and SPF 50 for your daytime routine.
+              Choose rituals you want to try and save them to your cloud routine.
             </p>
           </div>
 
-          <div class="grid-2">
-            <article class="content-card">
-              <h3>Morning Routine</h3>
-              <ul id="morning-list">
-                <li>Hydrating cleanser</li>
-                <li>Antioxidant serum</li>
-                <li>Moisturizer + SPF</li>
-              </ul>
-            </article>
-            <article class="content-card">
-              <h3>Evening Routine</h3>
-              <ul id="evening-list">
-                <li>Oil-based cleanser</li>
-                <li>Barrier-repair cream</li>
-                <li>Lip and eye hydration</li>
-              </ul>
-            </article>
-          </div>
+          <article class="content-card ritual-categories-card">
+            <div class="ritual-library__header">
+              <h3>Choose a Category</h3>
+              <button class="ghost-btn" id="refresh-rituals-btn">Refresh</button>
+            </div>
+            <div id="ritual-categories" class="ritual-categories" aria-label="Ritual categories"></div>
+          </article>
+
+          <article class="content-card ritual-library">
+            <div class="ritual-library__header">
+              <h3 id="ritual-list-title">Try these Skin Care rituals</h3>
+              <button class="ghost-btn" id="clear-rituals-btn">Clear Saved</button>
+            </div>
+            <p id="ritual-helper">
+              Tap a ritual to save/remove it. Saved rituals are synced with Supabase.
+            </p>
+            <div id="ritual-list" class="ritual-list" aria-label="Ritual options"></div>
+          </article>
 
           <article class="progress-card">
             <div>
-              <h3>Weekly Consistency</h3>
-              <p>Track your streak and improve one habit at a time.</p>
+              <h3>Saved Rituals</h3>
+              <p id="selection-summary">0 rituals saved in your account.</p>
             </div>
-            <div class="progress-ring" aria-label="Progress value">82%</div>
+            <div
+              class="progress-ring"
+              id="selection-count"
+              data-progress="0"
+              aria-label="Ritual selection count"
+            >
+              0
+            </div>
           </article>
         </section>
 
@@ -105,13 +131,13 @@
               <h2>Mia Thomson</h2>
               <p>Glow Member • Joined 2025</p>
             </div>
-            <button class="ghost-btn">Edit Profile</button>
+            <button class="ghost-btn" id="edit-profile-btn">Edit Profile</button>
           </article>
 
           <div class="stats-grid">
             <article class="stat">
-              <h3>24</h3>
-              <p>Habits Completed</p>
+              <h3 id="profile-ritual-count">0</h3>
+              <p>Saved Rituals</p>
             </article>
             <article class="stat">
               <h3>11</h3>
@@ -130,8 +156,8 @@
           <article class="content-card">
             <h3>About You</h3>
             <p>
-              Loving routines that are simple, effective, and gentle. Current goals:
-              brighter skin, healthier hair, and better sleep balance.
+              Keep your self-care journey in one place. Your saved rituals are now backed by
+              Supabase so your routine stays consistent.
             </p>
           </article>
         </section>
@@ -144,7 +170,8 @@
         <button class="bottom-nav__item" data-screen="second-screen">Discover</button>
         <button class="bottom-nav__item" data-screen="third-screen">Profile</button>
       </nav>
+      <p id="interaction-feedback" class="interaction-feedback" aria-live="polite"></p>
     </div>
-    <script src="./app.js"></script>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
