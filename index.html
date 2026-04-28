@@ -128,10 +128,10 @@
           <article class="profile-card">
             <div class="avatar" aria-hidden="true">M</div>
             <div>
-              <h2>Mia Thomson</h2>
-              <p>Glow Member • Joined 2025</p>
+              <h2 id="profile-display-name">Mia Thomson</h2>
+              <p id="profile-member-meta">Glow Member • Joined 2025</p>
             </div>
-            <button class="ghost-btn" id="edit-profile-btn">Edit Profile</button>
+            <button class="ghost-btn" id="edit-profile-btn">Edit Username</button>
           </article>
 
           <div class="stats-grid">
@@ -159,6 +159,30 @@
               Keep your self-care journey in one place. Your saved rituals are now backed by
               Supabase so your routine stays consistent.
             </p>
+          </article>
+
+          <article class="content-card profile-settings-card">
+            <h3>Profile Settings</h3>
+            <p>
+              Test your Supabase integration by updating your username. Changes are saved to the
+              <code>profiles</code> table.
+            </p>
+            <label class="profile-settings__label" for="username-input">Username</label>
+            <div class="profile-settings__actions">
+              <input
+                id="username-input"
+                class="profile-settings__input"
+                type="text"
+                placeholder="Enter a username"
+                minlength="3"
+                maxlength="24"
+                autocomplete="off"
+              />
+              <button class="luxury-btn profile-settings__save" id="save-username-btn">
+                Save Username
+              </button>
+            </div>
+            <p class="profile-settings__hint" id="current-username">Current username: not set</p>
           </article>
         </section>
       </main>

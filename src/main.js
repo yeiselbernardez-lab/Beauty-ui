@@ -22,6 +22,12 @@ const challengeButton = document.getElementById("challenge-button");
 const editProfileButton = document.getElementById("edit-profile-btn");
 const profileRitualCount = document.getElementById("profile-ritual-count");
 const feedbackArea = document.getElementById("interaction-feedback");
+const profileNameHeading = document.getElementById("profile-name");
+const profileMeta = document.getElementById("profile-meta");
+const profileUsernameText = document.getElementById("profile-username-text");
+const usernameForm = document.getElementById("username-form");
+const usernameInput = document.getElementById("username-input");
+const saveUsernameButton = document.getElementById("save-username-btn");
 
 const state = {
   categories: [],
@@ -29,6 +35,7 @@ const state = {
   selectedRitualIds: new Set(),
   selectedByCategoryName: new Map(),
   activeCategoryName: "Skin Care",
+  profile: null,
 };
 
 function showFeedback(message) {
@@ -96,6 +103,96 @@ function updateSummary() {
   if (profileRitualCount) {
     profileRitualCount.textContent = String(totalSelected);
   }
+}
+
+function applyProfileToUi(profile) {
+  const displayName = profile?.display_name ?? "Mia Thomson";
+  const username = profile?.username ? `@${profile.username}` : "@not-set";
+  const memberSince = profile?.created_at ? new Date(profile.created_at).getFullYear() : "2025";
+
+  if (profileNameHeading) {
+    profileNameHeading.textContent = displayName;
+  }
+  if (profileMeta) {
+    profileMeta.textContent = `Glow Member • Joined ${memberSince}`;
+  }
+  if (profileUsernameText) {
+    profileUsernameText.textContent = username;
+  }
+  if (usernameInput && profile?.username) {
+    usernameInput.value = profile.username;
+  }
+}
+
+async function ensureDemoProfileExists() {
+  const defaultProfile = {
+    id: DEMO_PROFILE_ID,
+    display_name: "Mia Thomson",
+    username: "miaglow",
+    email: "mia@example.com",
+    age_group: "25-34",
+    skin_type: "Combination",
+    goals: "Glow, confidence, and routine consistency",
+  };
+
+  const { error } = await supabase
+    .from("profiles")
+    .upsert(defaultProfile, { onConflict: "id" });
+
+  return error;
+}
+
+async function loadProfile() {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id,display_name,username,created_at")
+    .eq("id", DEMO_PROFILE_ID)
+    .maybeSingle();
+
+  if (error) {
+    showFeedback(`Could not load profile: ${error.message}`);
+    return;
+  }
+
+  state.profile = data;
+  applyProfileToUi(data);
+}
+
+async function saveUsername(event) {
+  event.preventDefault();
+  if (!usernameInput || !saveUsernameButton) return;
+
+  const nextUsername = usernameInput.value.trim().toLowerCase();
+  if (!nextUsername) {
+    showFeedback("Please enter a username.");
+    return;
+  }
+
+  const usernamePattern = /^[a-z0-9_]{3,30}$/;
+  if (!usernamePattern.test(nextUsername)) {
+    showFeedback("Use 3-30 chars: lowercase letters, numbers, underscores.");
+    return;
+  }
+
+  saveUsernameButton.disabled = true;
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({ username: nextUsername })
+    .eq("id", DEMO_PROFILE_ID)
+    .select("id,display_name,username,created_at")
+    .single();
+
+  saveUsernameButton.disabled = false;
+
+  if (error) {
+    showFeedback(`Could not save username: ${error.message}`);
+    return;
+  }
+
+  state.profile = data;
+  applyProfileToUi(data);
+  showFeedback("Username updated and saved in Supabase.");
 }
 
 function renderCategoryButtons() {
@@ -391,7 +488,9 @@ if (challengeButton) {
 
 if (editProfileButton) {
   editProfileButton.addEventListener("click", () => {
-    showFeedback("Profile editing can be connected to the profiles table next.");
+    setActiveScreen("third-screen");
+    usernameInput?.focus();
+    showFeedback("Edit your username below and click Save Username.");
   });
 }
 
@@ -406,7 +505,16 @@ if (clearRitualsButton) {
   clearRitualsButton.addEventListener("click", clearCategorySelections);
 }
 
+if (usernameForm) {
+  usernameForm.addEventListener("submit", saveUsername);
+}
+
 async function initializeApp() {
+  const profileInitError = await ensureDemoProfileExists();
+  if (profileInitError) {
+    showFeedback(`Profile setup error: ${profileInitError.message}`);
+  }
+  await loadProfile();
   await initializeCatalog();
   await loadSavedRituals();
 }
