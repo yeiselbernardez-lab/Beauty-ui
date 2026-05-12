@@ -474,6 +474,19 @@ body {
   width: fit-content;
 }
 
+.auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.auth-session-text {
+  margin: 0.15rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+}
+
 .profiles-list {
   margin: 0.35rem 0 0;
   padding-left: 1rem;

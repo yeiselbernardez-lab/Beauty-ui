@@ -29,6 +29,12 @@ const profileEmailInput = document.getElementById("profile-email-input");
 const profilesList = document.getElementById("profiles-list");
 const profileCount = document.getElementById("profile-count");
 const refreshProfilesButton = document.getElementById("refresh-profiles-btn");
+const authEmailInput = document.getElementById("auth-email-input");
+const authPasswordInput = document.getElementById("auth-password-input");
+const signUpButton = document.getElementById("signup-btn");
+const loginButton = document.getElementById("login-btn");
+const logoutButton = document.getElementById("logout-btn");
+const authSessionText = document.getElementById("auth-session-text");
 
 const state = {
   categories: [],
@@ -36,6 +42,7 @@ const state = {
   selectedRitualIds: new Set(),
   selectedByCategoryName: new Map(),
   activeCategoryName: "Skin Care",
+  authUser: null,
 };
 
 function showFeedback(message) {
@@ -110,6 +117,36 @@ function normalizeProfile(record) {
   };
 }
 
+function setAuthUi(user) {
+  state.authUser = user ?? null;
+  if (!authSessionText) return;
+
+  if (state.authUser) {
+    authSessionText.textContent = `Logged in as ${state.authUser.email}`;
+    if (logoutButton) logoutButton.disabled = false;
+  } else {
+    authSessionText.textContent = "Not logged in";
+    if (logoutButton) logoutButton.disabled = true;
+  }
+}
+
+function getAuthCredentials() {
+  const email = authEmailInput?.value.trim().toLowerCase();
+  const password = authPasswordInput?.value ?? "";
+
+  if (!email || !password) {
+    showFeedback("Enter auth email and password first.");
+    return null;
+  }
+
+  if (password.length < 6) {
+    showFeedback("Auth password must be at least 6 characters.");
+    return null;
+  }
+
+  return { email, password };
+}
+
 function renderProfiles(profiles) {
   profilesList.innerHTML = "";
 
@@ -178,11 +215,15 @@ async function fetchProfiles() {
 async function insertProfileWithFallback(name, email) {
   const insertAttempts = [
     {
-      label: "name/email columns",
+      label: "name + display_name + email",
+      payload: { name, display_name: name, email },
+    },
+    {
+      label: "name + email",
       payload: { name, email },
     },
     {
-      label: "display_name/email fallback",
+      label: "display_name + email",
       payload: { display_name: name, email },
     },
   ];
@@ -203,17 +244,57 @@ async function insertProfileWithFallback(name, email) {
     }
 
     lastError = error;
-    const message = error.message || "";
+    const message = (error.message || "").toLowerCase();
     const isMissingNameColumn = message.includes('column "name"');
     const isMissingDisplayNameColumn = message.includes('column "display_name"');
+    const isDuplicateEmail = error.code === "23505" && message.includes("email");
+    const isNotNullDisplayName = message.includes("display_name") && message.includes("not-null");
 
     console.warn(`[Supabase][Profiles][Warn] Insert attempt failed via ${attempt.label}:`, error);
 
-    if (
-      (attempt.label === "name/email columns" && isMissingNameColumn) ||
-      (attempt.label === "display_name/email fallback" && isMissingDisplayNameColumn)
-    ) {
+    if (isMissingNameColumn || isMissingDisplayNameColumn || isNotNullDisplayName) {
       continue;
+    }
+
+    if (isDuplicateEmail) {
+      console.log("[Supabase][Profiles][Step 3] Email exists, attempting update by email");
+      const updateAttempts = [
+        { label: "update name + display_name", payload: { name, display_name: name } },
+        { label: "update name", payload: { name } },
+        { label: "update display_name", payload: { display_name: name } },
+      ];
+
+      let updateLastError = null;
+      for (const updateAttempt of updateAttempts) {
+        const { data: updateData, error: updateError } = await supabase
+          .from("profiles")
+          .update(updateAttempt.payload)
+          .eq("email", email)
+          .select("*");
+
+        if (!updateError && updateData && updateData.length > 0) {
+          console.log(
+            `[Supabase][Profiles][Step 4] Existing profile updated via ${updateAttempt.label}:`,
+            updateData[0],
+          );
+          return { data: updateData[0], error: null };
+        }
+
+        updateLastError = updateError;
+        if (!updateError) {
+          continue;
+        }
+
+        const updateMessage = (updateError.message || "").toLowerCase();
+        if (
+          updateMessage.includes('column "name"') ||
+          updateMessage.includes('column "display_name"')
+        ) {
+          continue;
+        }
+      }
+
+      return { data: null, error: updateLastError ?? error };
     }
 
     return { data: null, error };
@@ -247,6 +328,80 @@ async function saveProfile(event) {
   profileForm.reset();
   showFeedback("Profile saved in Supabase.");
   await fetchProfiles();
+}
+
+async function handleSignUp() {
+  const credentials = getAuthCredentials();
+  if (!credentials) return;
+
+  console.log("[Supabase][Auth][Step 1] Starting sign up request:", {
+    email: credentials.email,
+  });
+  const { data, error } = await supabase.auth.signUp(credentials);
+
+  if (error) {
+    console.error("[Supabase][Auth][Error] Sign up failed:", error);
+    showFeedback(`Sign up failed: ${error.message}`);
+    return;
+  }
+
+  console.log("[Supabase][Auth][Step 2] Sign up success:", data);
+  setAuthUi(data.user ?? data.session?.user ?? null);
+  showFeedback("Sign up successful. Check your email if confirmation is enabled.");
+}
+
+async function handleLogin() {
+  const credentials = getAuthCredentials();
+  if (!credentials) return;
+
+  console.log("[Supabase][Auth][Step 1] Starting login request:", {
+    email: credentials.email,
+  });
+  const { data, error } = await supabase.auth.signInWithPassword(credentials);
+
+  if (error) {
+    console.error("[Supabase][Auth][Error] Login failed:", error);
+    showFeedback(`Login failed: ${error.message}`);
+    return;
+  }
+
+  console.log("[Supabase][Auth][Step 2] Login success:", data);
+  setAuthUi(data.user ?? data.session?.user ?? null);
+  showFeedback("Logged in successfully.");
+}
+
+async function handleLogout() {
+  console.log("[Supabase][Auth][Step 1] Starting logout request");
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error("[Supabase][Auth][Error] Logout failed:", error);
+    showFeedback(`Logout failed: ${error.message}`);
+    return;
+  }
+
+  console.log("[Supabase][Auth][Step 2] Logout success");
+  setAuthUi(null);
+  showFeedback("Logged out.");
+}
+
+async function initializeAuth() {
+  console.log("[Supabase][Auth][Init] Reading current session");
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error) {
+    console.error("[Supabase][Auth][Error] Session read failed:", error);
+    showFeedback(`Auth session error: ${error.message}`);
+    return;
+  }
+
+  setAuthUi(data.session?.user ?? null);
+  console.log("[Supabase][Auth][Init] Session loaded:", data.session);
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    console.log("[Supabase][Auth][Event]", event, session);
+    setAuthUi(session?.user ?? null);
+  });
 }
 
 function renderCategoryButtons() {
@@ -544,6 +699,18 @@ if (refreshProfilesButton) {
   refreshProfilesButton.addEventListener("click", fetchProfiles);
 }
 
+if (signUpButton) {
+  signUpButton.addEventListener("click", handleSignUp);
+}
+
+if (loginButton) {
+  loginButton.addEventListener("click", handleLogin);
+}
+
+if (logoutButton) {
+  logoutButton.addEventListener("click", handleLogout);
+}
+
 if (refreshRitualsButton) {
   refreshRitualsButton.addEventListener("click", async () => {
     await initializeCatalog();
@@ -559,8 +726,11 @@ if (profileForm) {
   profileForm.addEventListener("submit", saveProfile);
 }
 
+setAuthUi(null);
+
 async function initializeApp() {
   console.log("[Supabase][Init] App initialization started");
+  await initializeAuth();
   console.log("[Supabase][Init] Loading saved profiles from database");
   await fetchProfiles();
   console.log("[Supabase][Init] Loading categories and rituals");

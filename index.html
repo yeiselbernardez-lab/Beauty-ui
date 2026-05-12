@@ -162,6 +162,37 @@
           </article>
 
           <article class="content-card profile-settings-card">
+            <h3>Account Access</h3>
+            <p>Use Supabase Auth to sign up, log in, or log out.</p>
+            <div class="profile-form">
+              <label class="profile-settings__label" for="auth-email-input">Auth Email</label>
+              <input
+                id="auth-email-input"
+                class="profile-settings__input"
+                type="email"
+                placeholder="auth@example.com"
+                autocomplete="email"
+              />
+
+              <label class="profile-settings__label" for="auth-password-input">Auth Password</label>
+              <input
+                id="auth-password-input"
+                class="profile-settings__input"
+                type="password"
+                placeholder="Minimum 6 characters"
+                autocomplete="current-password"
+              />
+
+              <div class="auth-actions">
+                <button class="ghost-btn" id="signup-btn" type="button">Sign Up</button>
+                <button class="ghost-btn" id="login-btn" type="button">Login</button>
+                <button class="ghost-btn" id="logout-btn" type="button">Log Out</button>
+              </div>
+              <p id="auth-session-text" class="auth-session-text">Not logged in</p>
+            </div>
+          </article>
+
+          <article class="content-card profile-settings-card">
             <h3>Simple Profile Form</h3>
             <p>Enter a name and email, then save it to Supabase.</p>
             <form id="profile-form" class="profile-form">

@@ -62,3 +62,10 @@ create policy "Profiles are insertable"
 on public.profiles
 for insert
 with check (true);
+
+drop policy if exists "Profiles are updatable" on public.profiles;
+create policy "Profiles are updatable"
+on public.profiles
+for update
+using (true)
+with check (true);
