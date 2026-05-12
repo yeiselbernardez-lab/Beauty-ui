@@ -128,28 +128,28 @@
           <article class="profile-card">
             <div class="avatar" aria-hidden="true">M</div>
             <div>
-              <h2 id="profile-display-name">Mia Thomson</h2>
-              <p id="profile-member-meta">Glow Member • Joined 2025</p>
+              <h2 id="profile-name">No profile saved yet</h2>
+              <p id="profile-meta">Save a profile below to test Supabase integration.</p>
             </div>
-            <button class="ghost-btn" id="edit-profile-btn">Edit Username</button>
+            <button class="ghost-btn" id="refresh-profiles-btn">Reload Profiles</button>
           </article>
 
           <div class="stats-grid">
             <article class="stat">
-              <h3 id="profile-ritual-count">0</h3>
-              <p>Saved Rituals</p>
+              <h3 id="profile-count">0</h3>
+              <p>Saved Profiles</p>
             </article>
             <article class="stat">
-              <h3>11</h3>
-              <p>Day Streak</p>
+              <h3>DB</h3>
+              <p>Supabase</p>
             </article>
             <article class="stat">
-              <h3>8</h3>
-              <p>Saved Tutorials</p>
+              <h3>✔</h3>
+              <p>Insert Test</p>
             </article>
             <article class="stat">
-              <h3>3</h3>
-              <p>Goals This Month</p>
+              <h3>↻</h3>
+              <p>Reload Test</p>
             </article>
           </div>
 
@@ -162,27 +162,36 @@
           </article>
 
           <article class="content-card profile-settings-card">
-            <h3>Profile Settings</h3>
-            <p>
-              Test your Supabase integration by updating your username. Changes are saved to the
-              <code>profiles</code> table.
-            </p>
-            <label class="profile-settings__label" for="username-input">Username</label>
-            <div class="profile-settings__actions">
+            <h3>Simple Profile Form</h3>
+            <p>Enter a name and email, then save it to Supabase.</p>
+            <form id="profile-form" class="profile-form">
+              <label class="profile-settings__label" for="profile-name-input">Name</label>
               <input
-                id="username-input"
+                id="profile-name-input"
                 class="profile-settings__input"
                 type="text"
-                placeholder="Enter a username"
-                minlength="3"
-                maxlength="24"
-                autocomplete="off"
+                placeholder="Your name"
+                required
               />
-              <button class="luxury-btn profile-settings__save" id="save-username-btn">
-                Save Username
+              <label class="profile-settings__label" for="profile-email-input">Email</label>
+              <input
+                id="profile-email-input"
+                class="profile-settings__input"
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
+              <button class="luxury-btn profile-settings__save" id="save-profile-btn" type="submit">
+                Save Profile
               </button>
-            </div>
-            <p class="profile-settings__hint" id="current-username">Current username: not set</p>
+            </form>
+          </article>
+
+          <article class="content-card profile-settings-card">
+            <h3>Saved Profiles (loaded from Supabase)</h3>
+            <ul id="profiles-list" class="profiles-list">
+              <li>Loading profiles...</li>
+            </ul>
           </article>
         </section>
       </main>

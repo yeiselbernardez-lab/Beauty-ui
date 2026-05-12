@@ -442,7 +442,7 @@ body {
   margin-top: 1rem;
 }
 
-.username-label {
+.profile-settings__label {
   display: block;
   font-size: 0.9rem;
   font-weight: 600;
@@ -450,23 +450,12 @@ body {
   margin-bottom: 0.45rem;
 }
 
-.username-form {
+.profile-form {
   display: grid;
   gap: 0.65rem;
 }
 
-.username-input-row {
-  display: flex;
-  gap: 0.55rem;
-  align-items: center;
-}
-
-.username-prefix {
-  font-weight: 700;
-  color: var(--accent-strong);
-}
-
-.username-input {
+.profile-settings__input {
   flex: 1;
   border: 1px solid rgba(157, 129, 188, 0.46);
   border-radius: 0.75rem;
@@ -476,15 +465,28 @@ body {
   background: rgba(255, 255, 255, 0.82);
 }
 
-.username-input:focus-visible {
+.profile-settings__input:focus-visible {
   outline: 2px solid rgba(196, 133, 159, 0.45);
   outline-offset: 1px;
 }
 
-.username-help {
-  margin: 0;
+.profile-settings__save {
+  width: fit-content;
+}
+
+.profiles-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1rem;
   color: var(--text-secondary);
-  font-size: 0.84rem;
+  display: grid;
+  gap: 0.35rem;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.profiles-list li {
+  margin: 0;
+  line-height: 1.35;
 }
 
 .avatar {

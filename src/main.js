@@ -19,15 +19,15 @@ const selectionCount = document.getElementById("selection-count");
 const refreshRitualsButton = document.getElementById("refresh-rituals-btn");
 const clearRitualsButton = document.getElementById("clear-rituals-btn");
 const challengeButton = document.getElementById("challenge-button");
-const editProfileButton = document.getElementById("edit-profile-btn");
-const profileRitualCount = document.getElementById("profile-ritual-count");
 const feedbackArea = document.getElementById("interaction-feedback");
 const profileNameHeading = document.getElementById("profile-name");
 const profileMeta = document.getElementById("profile-meta");
-const profileUsernameText = document.getElementById("profile-username-text");
-const usernameForm = document.getElementById("username-form");
-const usernameInput = document.getElementById("username-input");
-const saveUsernameButton = document.getElementById("save-username-btn");
+const profileForm = document.getElementById("profile-form");
+const profileNameInput = document.getElementById("profile-name-input");
+const profileEmailInput = document.getElementById("profile-email-input");
+const profilesList = document.getElementById("profiles-list");
+const profileCount = document.getElementById("profile-count");
+const refreshProfilesButton = document.getElementById("refresh-profiles-btn");
 
 const state = {
   categories: [],
@@ -35,7 +35,6 @@ const state = {
   selectedRitualIds: new Set(),
   selectedByCategoryName: new Map(),
   activeCategoryName: "Skin Care",
-  profile: null,
 };
 
 function showFeedback(message) {
@@ -99,100 +98,100 @@ function updateSummary() {
   }.`;
   selectionCount.textContent = totalSelected > 99 ? "99+" : String(totalSelected);
   selectionCount.style.setProperty("--progress-angle", `${progress}%`);
-
-  if (profileRitualCount) {
-    profileRitualCount.textContent = String(totalSelected);
-  }
-}
-
-function applyProfileToUi(profile) {
-  const displayName = profile?.display_name ?? "Mia Thomson";
-  const username = profile?.username ? `@${profile.username}` : "@not-set";
-  const memberSince = profile?.created_at ? new Date(profile.created_at).getFullYear() : "2025";
-
-  if (profileNameHeading) {
-    profileNameHeading.textContent = displayName;
-  }
-  if (profileMeta) {
-    profileMeta.textContent = `Glow Member • Joined ${memberSince}`;
-  }
-  if (profileUsernameText) {
-    profileUsernameText.textContent = username;
-  }
-  if (usernameInput && profile?.username) {
-    usernameInput.value = profile.username;
-  }
 }
 
 async function ensureDemoProfileExists() {
-  const defaultProfile = {
-    id: DEMO_PROFILE_ID,
-    display_name: "Mia Thomson",
-    username: "miaglow",
-    email: "mia@example.com",
-    age_group: "25-34",
-    skin_type: "Combination",
-    goals: "Glow, confidence, and routine consistency",
-  };
-
-  const { error } = await supabase
-    .from("profiles")
-    .upsert(defaultProfile, { onConflict: "id" });
-
+  const { error } = await supabase.from("profiles").upsert(
+    {
+      id: DEMO_PROFILE_ID,
+      name: "Demo User",
+      email: "demo-user@beauty.app",
+    },
+    { onConflict: "id" },
+  );
   return error;
 }
 
-async function loadProfile() {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id,display_name,username,created_at")
-    .eq("id", DEMO_PROFILE_ID)
-    .maybeSingle();
+function renderProfiles(profiles) {
+  profilesList.innerHTML = "";
 
-  if (error) {
-    showFeedback(`Could not load profile: ${error.message}`);
+  if (!profiles || profiles.length === 0) {
+    if (profileNameHeading) {
+      profileNameHeading.textContent = "No profile saved yet";
+    }
+    if (profileMeta) {
+      profileMeta.textContent = "Save a profile below to test Supabase integration.";
+    }
+    if (profileCount) {
+      profileCount.textContent = "0";
+    }
+    const empty = document.createElement("li");
+    empty.textContent = "No profiles found in database.";
+    profilesList.appendChild(empty);
     return;
   }
 
-  state.profile = data;
-  applyProfileToUi(data);
+  const latestProfile = profiles[0];
+  if (profileNameHeading) {
+    profileNameHeading.textContent = latestProfile.name;
+  }
+  if (profileMeta) {
+    profileMeta.textContent = `${latestProfile.email} • Saved ${new Date(latestProfile.created_at).toLocaleString()}`;
+  }
+  if (profileCount) {
+    profileCount.textContent = String(profiles.length);
+  }
+
+  profiles.forEach((profile) => {
+    const li = document.createElement("li");
+    li.textContent = `${profile.name} (${profile.email})`;
+    profilesList.appendChild(li);
+  });
 }
 
-async function saveUsername(event) {
+async function fetchProfiles() {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id,name,email,created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("[Supabase] profile fetch error:", error);
+    showFeedback(`Could not load profiles: ${error.message}`);
+    return;
+  }
+
+  console.log("[Supabase] profiles fetched successfully:", data);
+  renderProfiles(data ?? []);
+}
+
+async function saveProfile(event) {
   event.preventDefault();
-  if (!usernameInput || !saveUsernameButton) return;
+  if (!profileNameInput || !profileEmailInput) return;
 
-  const nextUsername = usernameInput.value.trim().toLowerCase();
-  if (!nextUsername) {
-    showFeedback("Please enter a username.");
+  const name = profileNameInput.value.trim();
+  const email = profileEmailInput.value.trim().toLowerCase();
+  if (!name || !email) {
+    showFeedback("Please enter both name and email.");
     return;
   }
-
-  const usernamePattern = /^[a-z0-9_]{3,30}$/;
-  if (!usernamePattern.test(nextUsername)) {
-    showFeedback("Use 3-30 chars: lowercase letters, numbers, underscores.");
-    return;
-  }
-
-  saveUsernameButton.disabled = true;
 
   const { data, error } = await supabase
     .from("profiles")
-    .update({ username: nextUsername })
-    .eq("id", DEMO_PROFILE_ID)
-    .select("id,display_name,username,created_at")
+    .insert({ name, email })
+    .select("id,name,email,created_at")
     .single();
 
-  saveUsernameButton.disabled = false;
-
   if (error) {
-    showFeedback(`Could not save username: ${error.message}`);
+    console.error("[Supabase] profile insert error:", error);
+    showFeedback(`Could not save profile: ${error.message}`);
     return;
   }
 
-  state.profile = data;
-  applyProfileToUi(data);
-  showFeedback("Username updated and saved in Supabase.");
+  console.log("[Supabase] profile insert successful:", data);
+  profileForm.reset();
+  showFeedback("Profile saved in Supabase.");
+  await fetchProfiles();
 }
 
 function renderCategoryButtons() {
@@ -486,12 +485,8 @@ if (challengeButton) {
   });
 }
 
-if (editProfileButton) {
-  editProfileButton.addEventListener("click", () => {
-    setActiveScreen("third-screen");
-    usernameInput?.focus();
-    showFeedback("Edit your username below and click Save Username.");
-  });
+if (refreshProfilesButton) {
+  refreshProfilesButton.addEventListener("click", fetchProfiles);
 }
 
 if (refreshRitualsButton) {
@@ -505,8 +500,8 @@ if (clearRitualsButton) {
   clearRitualsButton.addEventListener("click", clearCategorySelections);
 }
 
-if (usernameForm) {
-  usernameForm.addEventListener("submit", saveUsername);
+if (profileForm) {
+  profileForm.addEventListener("submit", saveProfile);
 }
 
 async function initializeApp() {
@@ -514,7 +509,7 @@ async function initializeApp() {
   if (profileInitError) {
     showFeedback(`Profile setup error: ${profileInitError.message}`);
   }
-  await loadProfile();
+  await fetchProfiles();
   await initializeCatalog();
   await loadSavedRituals();
 }

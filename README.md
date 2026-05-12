@@ -41,13 +41,27 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 1. Open your Supabase project dashboard.
 2. In left sidebar, go to **SQL Editor**.
 3. Click **New query**.
-4. Open this repo file: `supabase-schema.sql`.
+4. Open this repo file:
+   - `supabase-schema.sql` for full app tables, or
+   - `supabase-simple-profile-schema.sql` for the simple profile-only test flow.
 5. Copy all SQL from that file and paste into SQL Editor.
 6. Click **Run**.
 
 This creates tables, indexes, triggers, and RLS policies.
 
-## 4) Demo user id for this frontend
+## 4) Simple profile integration test
+
+- Go to the **Profile** screen in the app.
+- Fill in **Name** and **Email**.
+- Click **Save Profile**.
+- The saved profile will be inserted into Supabase and shown in the **Saved Profiles** list.
+- Refresh the page to verify records are fetched again on load.
+
+Console logs are included for:
+- successful inserts (`[Supabase] profile insert successful`)
+- insert/fetch errors (`[Supabase] profile insert error`, `[Supabase] profile fetch error`)
+
+## 5) Demo user id for ritual planner
 
 For simplicity, this frontend uses a fixed demo user UUID:
 
@@ -55,9 +69,10 @@ For simplicity, this frontend uses a fixed demo user UUID:
 
 The schema seeds this profile so CRUD works immediately.
 
-## 5) File guide
+## 6) File guide
 
 - `supabase-schema.sql` → full schema + RLS + seeds
+- `supabase-simple-profile-schema.sql` → simple `profiles` table schema for quick integration testing
 - `src/supabaseClient.js` → Supabase client singleton
 - `src/main.js` → app UI logic + CRUD wiring
 - `src/ritualCatalog.js` → ritual categories and options
