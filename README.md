@@ -58,8 +58,9 @@ This creates tables, indexes, triggers, and RLS policies.
 - Refresh the page to verify records are fetched again on load.
 
 Console logs are included for:
-- successful inserts (`[Supabase] profile insert successful`)
-- insert/fetch errors (`[Supabase] profile insert error`, `[Supabase] profile fetch error`)
+- successful inserts (`[Supabase][Profiles][Success] Insert complete`)
+- insert/fetch errors (`[Supabase][Profiles][Error] ...`)
+- initialization steps (`[Supabase][Init] ...`)
 
 ## 5) Demo user id for ritual planner
 

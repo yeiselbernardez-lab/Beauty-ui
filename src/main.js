@@ -22,6 +22,7 @@ const challengeButton = document.getElementById("challenge-button");
 const feedbackArea = document.getElementById("interaction-feedback");
 const profileNameHeading = document.getElementById("profile-name");
 const profileMeta = document.getElementById("profile-meta");
+const homeWelcomeTitle = document.getElementById("home-welcome-title");
 const profileForm = document.getElementById("profile-form");
 const profileNameInput = document.getElementById("profile-name-input");
 const profileEmailInput = document.getElementById("profile-email-input");
@@ -100,16 +101,13 @@ function updateSummary() {
   selectionCount.style.setProperty("--progress-angle", `${progress}%`);
 }
 
-async function ensureDemoProfileExists() {
-  const { error } = await supabase.from("profiles").upsert(
-    {
-      id: DEMO_PROFILE_ID,
-      name: "Demo User",
-      email: "demo-user@beauty.app",
-    },
-    { onConflict: "id" },
-  );
-  return error;
+function normalizeProfile(record) {
+  return {
+    id: record.id,
+    name: record.name ?? record.display_name ?? "Unnamed Profile",
+    email: record.email ?? "no-email@example.com",
+    createdAt: record.created_at ? new Date(record.created_at) : null,
+  };
 }
 
 function renderProfiles(profiles) {
@@ -128,21 +126,31 @@ function renderProfiles(profiles) {
     const empty = document.createElement("li");
     empty.textContent = "No profiles found in database.";
     profilesList.appendChild(empty);
+    if (homeWelcomeTitle) {
+      homeWelcomeTitle.textContent = "Welcome";
+    }
     return;
   }
 
-  const latestProfile = profiles[0];
+  const normalizedProfiles = profiles.map(normalizeProfile);
+  const latestProfile = normalizedProfiles[0];
+
   if (profileNameHeading) {
     profileNameHeading.textContent = latestProfile.name;
   }
   if (profileMeta) {
-    profileMeta.textContent = `${latestProfile.email} • Saved ${new Date(latestProfile.created_at).toLocaleString()}`;
+    profileMeta.textContent = `${latestProfile.email} • Saved ${
+      latestProfile.createdAt ? latestProfile.createdAt.toLocaleString() : "just now"
+    }`;
+  }
+  if (homeWelcomeTitle) {
+    homeWelcomeTitle.textContent = `Welcome, ${latestProfile.name}`;
   }
   if (profileCount) {
-    profileCount.textContent = String(profiles.length);
+    profileCount.textContent = String(normalizedProfiles.length);
   }
 
-  profiles.forEach((profile) => {
+  normalizedProfiles.forEach((profile) => {
     const li = document.createElement("li");
     li.textContent = `${profile.name} (${profile.email})`;
     profilesList.appendChild(li);
@@ -150,19 +158,68 @@ function renderProfiles(profiles) {
 }
 
 async function fetchProfiles() {
+  console.log("[Supabase][Profiles][Step 1] Starting profile fetch query");
+
   const { data, error } = await supabase
     .from("profiles")
-    .select("id,name,email,created_at")
+    .select("*")
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("[Supabase] profile fetch error:", error);
+    console.error("[Supabase][Profiles][Error] Fetch failed:", error);
     showFeedback(`Could not load profiles: ${error.message}`);
     return;
   }
 
-  console.log("[Supabase] profiles fetched successfully:", data);
+  console.log("[Supabase][Profiles][Step 2] Fetch successful:", data);
   renderProfiles(data ?? []);
+}
+
+async function insertProfileWithFallback(name, email) {
+  const insertAttempts = [
+    {
+      label: "name/email columns",
+      payload: { name, email },
+    },
+    {
+      label: "display_name/email fallback",
+      payload: { display_name: name, email },
+    },
+  ];
+
+  let lastError = null;
+
+  for (const attempt of insertAttempts) {
+    console.log(`[Supabase][Profiles][Step 2] Insert attempt via ${attempt.label}:`, attempt.payload);
+    const { data, error } = await supabase
+      .from("profiles")
+      .insert(attempt.payload)
+      .select("*")
+      .single();
+
+    if (!error) {
+      console.log(`[Supabase][Profiles][Step 3] Insert successful via ${attempt.label}:`, data);
+      return { data, error: null };
+    }
+
+    lastError = error;
+    const message = error.message || "";
+    const isMissingNameColumn = message.includes('column "name"');
+    const isMissingDisplayNameColumn = message.includes('column "display_name"');
+
+    console.warn(`[Supabase][Profiles][Warn] Insert attempt failed via ${attempt.label}:`, error);
+
+    if (
+      (attempt.label === "name/email columns" && isMissingNameColumn) ||
+      (attempt.label === "display_name/email fallback" && isMissingDisplayNameColumn)
+    ) {
+      continue;
+    }
+
+    return { data: null, error };
+  }
+
+  return { data: null, error: lastError };
 }
 
 async function saveProfile(event) {
@@ -176,19 +233,17 @@ async function saveProfile(event) {
     return;
   }
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .insert({ name, email })
-    .select("id,name,email,created_at")
-    .single();
+  console.log("[Supabase][Profiles][Step 1] Saving profile form payload:", { name, email });
+
+  const { data, error } = await insertProfileWithFallback(name, email);
 
   if (error) {
-    console.error("[Supabase] profile insert error:", error);
+    console.error("[Supabase][Profiles][Error] Insert failed:", error);
     showFeedback(`Could not save profile: ${error.message}`);
     return;
   }
 
-  console.log("[Supabase] profile insert successful:", data);
+  console.log("[Supabase][Profiles][Success] Insert complete:", data);
   profileForm.reset();
   showFeedback("Profile saved in Supabase.");
   await fetchProfiles();
@@ -505,13 +560,14 @@ if (profileForm) {
 }
 
 async function initializeApp() {
-  const profileInitError = await ensureDemoProfileExists();
-  if (profileInitError) {
-    showFeedback(`Profile setup error: ${profileInitError.message}`);
-  }
+  console.log("[Supabase][Init] App initialization started");
+  console.log("[Supabase][Init] Loading saved profiles from database");
   await fetchProfiles();
+  console.log("[Supabase][Init] Loading categories and rituals");
   await initializeCatalog();
+  console.log("[Supabase][Init] Loading saved ritual selections");
   await loadSavedRituals();
+  console.log("[Supabase][Init] Initialization complete");
 }
 
 initializeApp();

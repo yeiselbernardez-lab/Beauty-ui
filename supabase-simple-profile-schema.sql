@@ -16,9 +16,24 @@ alter table public.profiles
   add column if not exists email text,
   add column if not exists created_at timestamptz default timezone('utc', now());
 
-update public.profiles
-set name = coalesce(name, 'Unknown User')
-where name is null;
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public' and table_name = 'profiles' and column_name = 'display_name'
+  ) then
+    execute $q$
+      update public.profiles
+      set name = coalesce(name, display_name, 'Unknown User')
+      where name is null
+    $q$;
+  else
+    update public.profiles
+    set name = coalesce(name, 'Unknown User')
+    where name is null;
+  end if;
+end $$;
 
 update public.profiles
 set email = coalesce(email, concat('user-', substring(id::text from 1 for 8), '@example.com'))
@@ -32,8 +47,7 @@ alter table public.profiles alter column name set not null;
 alter table public.profiles alter column email set not null;
 alter table public.profiles alter column created_at set not null;
 
-create unique index if not exists profiles_email_unique_idx
-  on public.profiles (lower(email));
+drop index if exists profiles_email_unique_idx;
 
 alter table public.profiles enable row level security;
 

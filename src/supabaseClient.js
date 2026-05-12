@@ -9,6 +9,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+console.log("[Supabase][Client] Initializing client with NEXT_PUBLIC environment variables");
+console.log("[Supabase][Client] URL detected:", supabaseUrl);
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: false,
